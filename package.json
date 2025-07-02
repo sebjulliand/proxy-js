@@ -12,13 +12,17 @@
   "license": "MIT",
   "dependencies": {
     "@types/node": "^20.16.10",
+    "dotenv": "^17.0.1",
     "esbuild-loader": "^4.2.2",
-    "http-proxy": "^1.18.1",
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^3.0.5",
+    "morgan": "^1.10.0",
     "typescript": "^5.6.2",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
   },
   "devDependencies": {
-    "@types/http-proxy": "^1.17.16"
+    "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10"
   }
 }
