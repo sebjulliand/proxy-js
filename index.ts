@@ -44,7 +44,7 @@ const server = http.createServer((req, res) => {
       "utf-8"
     );
     const [username, password] = credentials.split(":");
-    console.log(`[${now}] 🔑 Connection attempt of ${username}`);
+    console.log(`[${now}] 🔑 User ${username} connection attempt`);
     if (username !== validUsername || password !== validPassword) {
       console.log(`[${now}] ❌ Access denied for ${username}`);
       res.writeHead(403);
