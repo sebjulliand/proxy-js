@@ -1,6 +1,7 @@
 import http from "http";
 import httpProxy from "http-proxy";
 import net from "net";
+import os from "os";
 
 const missingEnv = ['proxyPort', 'proxyTarget']
   .filter(key => process.env[key] === undefined || process.env[key] === "")
@@ -52,7 +53,7 @@ const server = http.createServer((req, res) => {
     }
     console.log(`[${now}] ✅ Authentication successful, redirecting...`);
   }
-  else{
+  else {
     console.log(`[${now}] ✅ Redirecting...`);
   }
 
@@ -109,5 +110,5 @@ server.on("connect", (req, clientSocket, head) => {
 // Lancement du proxy
 const PORT = Number(process.env.proxyPort);
 server.listen(PORT, () => {
-  console.log(`[${new Date().toISOString()}] 🚀 Proxy listening on http://localhost:${PORT} targetting ${process.env.proxyTarget}${validUsername ? " (🔑 requires authentication)" : ""}`);
+  console.log(`[${new Date().toISOString()}] 🚀 Proxy listening on http://${os.hostname()}:${PORT} targetting ${process.env.proxyTarget}${validUsername ? " (🔑 requires authentication)" : ""}`);
 });
