@@ -16,13 +16,11 @@
     "esbuild-loader": "^4.2.2",
     "express": "^5.1.0",
     "http-proxy-middleware": "^3.0.5",
-    "morgan": "^1.10.0",
     "typescript": "^5.6.2",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
   },
   "devDependencies": {
-    "@types/express": "^5.0.3",
-    "@types/morgan": "^1.9.10"
+    "@types/express": "^5.0.3"
   }
 }

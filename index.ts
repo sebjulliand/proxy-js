@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
-import morgan from "morgan";
 import net from "net";
 import os from "os";
 
@@ -30,7 +29,15 @@ if (proxyUser && !proxyPassword) {
 const app = express();
 
 // Logging the requests
-app.use(morgan("dev"));
+const logRequest = (req) => {
+  console.log(`Request: ${req.method} ${req.originalUrl || req.url}`);
+  Object.entries(req.headers).forEach(([key, value]) => console.log("  ", key, value));
+};
+
+app.use('', (req, res, next) => {
+  logRequest(req);
+  next();
+});
 
 let checkAuth = (auth?: string) => true;
 if (proxyUser) {
@@ -72,21 +79,26 @@ app.use(
   })
 );
 
-app.connect("/", (req, res) => {
-  console.log("hello")
-  console.log(req)
-});
-
 // Starting our Proxy server
 const server = app.listen(Number(proxyPort), () => {
-  console.log(`Starting Proxy at http://${os.hostname()}:${proxyPort} - redirects to ${proxyTarget}${proxyUser ? " (🔑 Requires authentication)" : ""}`);
+  console.log(`🚀 Proxy started on http://${os.hostname()}:${proxyPort} - redirects to ${proxyTarget}${proxyUser ? " (🔑 Requires authentication)" : ""}`);
 });
 
 server.on("connect", (req, clientSocket, head) => {
+  logRequest(req);
   if (req.url) {
     console.log(`🔌 CONNECT request on ${req.url}`);
     const authHeader = req.headers["proxy-authorization"];
-    if (!authHeader || checkAuth(authHeader)) {
+    if (proxyUser && !authHeader) {
+      console.log(`❌ Missing authentication (CONNECT)`);
+      clientSocket.write(
+        'HTTP/1.1 407 Proxy Authentication Required\r\nProxy-Authenticate: Basic realm="Proxy"\r\n\r\n'
+      );
+      clientSocket.destroy();
+      return;
+    }
+
+    if (checkAuth(authHeader)) {
       const [host, port] = req.url.split(":");
       if (host && port) {
         const serverSocket = net.connect(port ? Number(port) : 443, host, () => {
@@ -103,7 +115,7 @@ server.on("connect", (req, clientSocket, head) => {
         });
         clientSocket.on("error", (err: any) => {
           if (err.code === "ECONNRESET") {
-            console.log("Connection reset by client");
+            console.debug("Connection reset by client");
           }
           else {
             throw err;
