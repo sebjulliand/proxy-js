@@ -99,11 +99,21 @@ server.on("connect", (req, clientSocket, head) => {
       serverSocket.pipe(clientSocket);
       clientSocket.pipe(serverSocket);
     });
+
     serverSocket.on("error", (err) => {
       console.error(`[${now}] ❌ HTTPS tunneling error :`, err.message);
       clientSocket.write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
       clientSocket.destroy();
     });
+
+    clientSocket.on("error", (err: any) => {
+      if (err.code === "ECONNRESET") {
+        console.log("Connection reset by client");
+      }
+      else {
+        throw err;
+      }
+    })
   }
 });
 
